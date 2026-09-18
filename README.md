@@ -1,18 +1,58 @@
 # MFMD-YOLOv8
 
-Reference implementation for **MFMD-YOLOv8: An Enhanced Lightweight Framework for Mongolian Furniture Motif Detection**.
+**MFMD-YOLOv8: An Enhanced Lightweight Framework for Mongolian Furniture Motif Detection**
 
-This reconstruction-oriented release contains the model definitions, RCS-OSA, BRA, the explicit CIoU/WIoU v3 loss switch, paper training settings, comparison-model documentation, dataset preparation templates, evaluation and visualization utilities, interpretability scripts, automated tests, and reproducibility notes. It does not contain the furniture photographs, annotations, checkpoints, experiment outputs, caches, or machine-specific paths.
+Official PyTorch reference implementation of MFMD-YOLOv8, a lightweight detector for animal, plant, and geometric motifs on traditional Mongolian painted furniture.
 
-Materials are labelled by provenance. `manuscript_reported` means a direct paper transcription, `reconstructed_from_manuscript` means a new implementation of a described procedure, `measured_run_pending` means that new experiments are required, and `synthetic_smoke_test_only` is never scientific evidence. See `docs/PROVENANCE_MATRIX.md`.
+Built on YOLOv8n, the model integrates:
+- **RCS-OSA** for multi-scale feature aggregation and reuse
+- **Bi-Level Routing Attention (BRA)** for content-dependent spatial interaction
+- **Wise-IoU v3 (WIoU v3)** for dynamic non-monotonic bounding-box regression
 
-## Method and experiment scope
+## Key Results
 
-The released detector is based on YOLOv8n and uses three motif classes in this order: `geometry`, `animal`, `plant`. MFMD-YOLOv8 replaces C2f blocks in the backbone and neck with RCS-OSA, inserts BRA immediately after SPPF, and selects WIoU v3 for the bounding-box regression term. BCE classification loss and DFL are retained. The baseline and ablations select CIoU or WIoU v3 explicitly through `iou_loss`.
+| Metric              | MFMD-YOLOv8     | YOLOv8n (baseline) | Improvement |
+|---------------------|-----------------|--------------------|-------------|
+| mAP@0.5             | **87.9%**       | 83.6%              | +4.3 pp     |
+| mAP@0.5:0.95        | **59.3%**       | 55.2%              | +4.1 pp     |
+| Recall              | **88.6%**       | 77.1%              | +11.5 pp    |
+| Precision           | **86.7%**       | 80.6%              | +6.1 pp     |
+| Parameters          | 4.3 M           | 3.0 M              | —           |
+| GFLOPs (640×640)    | 20.9            | 8.2                | —           |
+| Speed (FPS)         | 88.4            | 105.4              | —           |
 
-The proposed MFMD-YOLOv8 model contains 4.342 M parameters and requires 20.911 GFLOPs at an input resolution of 640×640 (exact parameter count: 4,342,313). Complexity is measured using standard `model.info(imgsz=640)` (retaining full GFLOPs without artificial division by 2 for GMACs).
+Results are mean values across three independent runs (seeds 0, 1, 42) on the fixed internal test set.
 
-The manuscript reports 640×640 inputs, batch size 8, SGD with initial learning rate 0.01, momentum 0.937, weight decay 0.0005, three warm-up epochs, cosine scheduling, AMP, up to 300 epochs, early-stopping patience 50, and seeds 0, 1, and 42. Training uses a fixed source-group partition and a fixed offline-augmented training set; online augmentation is disabled in the paper configuration.
+## Test Configuration
+
+- OS: Windows 10 Pro
+- CPU: Intel Core i5-13600KF
+- RAM: 32 GB
+- GPU: NVIDIA GeForce RTX 4060 Ti (8 GB VRAM)
+- Software: Python 3.10.19, PyTorch 2.5.1, CUDA 12.1, cuDNN 9.1, Ultralytics 8.0.166
+
+## Dataset
+
+- 1,320 ROI images and 2,992 annotated instances from 237 traditional Mongolian furniture items
+- Three classes (in order): `geometry`, `animal`, `plant`
+- Source-group-aware partitioning (all observations from the same furniture item stay in one subset)
+- Offline augmentation applied only to the training set; online augmentation disabled in the paper protocol
+
+The image dataset itself is not distributed with this repository. Prepare a local YOLO-format dataset and copy `configs/data.example.yaml` to a local YAML, replacing the placeholder path. Expected structure:
+
+```text
+dataset/
+├── images/{train,val,test}/
+└── labels/{train,val,test}/
+```
+
+## Method Overview
+
+1. **RCS-OSA** replaces C2f blocks in the backbone and neck to support feature reuse across motifs of varying scales and fine brushstroke details.
+2. **BRA** is inserted immediately after SPPF to perform content-dependent sparse attention, reducing interference from surface cracks, pigment loss, and dense ornamentation.
+3. **WIoU v3** provides non-monotonic weighting of regression errors according to relative prediction quality.
+
+The model contains 4,342,313 parameters and requires 20.911 GFLOPs at 640×640 input. Complexity is measured with standard `model.info(imgsz=640)`.
 
 ## Installation
 
@@ -25,21 +65,9 @@ pip install -e .
 
 The code is based on the Ultralytics YOLOv8 source included in this directory. The upstream AGPL-3.0 license is retained in `LICENSE`.
 
-## Dataset YAML
-
-The image dataset is not distributed. Prepare a local YOLO-format dataset and copy `configs/data.example.yaml` to a local YAML, replacing `/path/to/mfmd_dataset`. The expected structure is:
-
-```text
-dataset/
-├── images/{train,val,test}/
-└── labels/{train,val,test}/
-```
-
-Labels use normalized YOLO `class x_center y_center width height` rows. The class indices must follow the order in the example YAML.
-
 ## Training
 
-COCO-pretrained YOLOv8n weights are expected to be obtained separately. They are not included in this release.
+COCO-pretrained YOLOv8n weights must be obtained separately (not included in this release).
 
 One MFMD-YOLOv8 run:
 
@@ -47,69 +75,63 @@ One MFMD-YOLOv8 run:
 python scripts/train.py --data /path/to/data.yaml --model mfmd_yolov8.yaml --iou-loss wiou_v3 --weights yolov8n.pt --seed 0
 ```
 
-The `--model` argument resolves files under `configs/models`. To reproduce the three seeds sequentially:
+Three-seed training:
 
 ```bash
 python scripts/train_three_seeds.py --data /path/to/data.yaml --model mfmd_yolov8.yaml --iou-loss wiou_v3 --weights yolov8n.pt
 ```
 
-For the baseline, use `yolov8n_baseline.yaml` with `--iou-loss ciou`. The eight combinations in the ablation table are listed in `configs/ablation.yaml` and can be launched with:
+For the baseline use `yolov8n_baseline.yaml` with `--iou-loss ciou`. Ablation combinations are listed in `configs/ablation.yaml` and can be launched with:
 
 ```bash
 python scripts/train_ablation.py --data /path/to/data.yaml --experiment all --weights yolov8n.pt
 ```
 
-The training script resets the WIoU v3 running mean for every independent run. This is important when multiple seeds or configurations are launched by one process.
+The training script resets the WIoU v3 running mean for every independent run.
 
-## Comparison models
-
-The 12 comparison detectors—Faster R-CNN, SSD-MobileNetV2, YOLOv5n, YOLOv8n, YOLOv8s, YOLOv9t, YOLOv10n, YOLOv11n, YOLOv12n, RTMDet-tiny, RT-DETR-L, and RT-DETR-X—are documented under `comparisons/`.
-
-The package includes their registry, shared protocol, paper-reported results, a three-seed aggregation utility, and an external-Ultralytics launcher. Complete third-party repositories and pretrained weights are not redistributed. Entries whose exact source commit or optimizer cannot be established from the manuscript or retained logs are marked `pending_author_confirmation` rather than being replaced by an assumed implementation.
-
-```bash
-python comparisons/scripts/validate_registry.py
-python comparisons/scripts/aggregate_three_seeds.py --input measured_results.csv --output comparison_summary.csv
-```
-
-## Evaluation and inference
+## Evaluation and Inference
 
 ```bash
 python scripts/val.py --weights /path/to/best.pt --data /path/to/data.yaml --split test
 python scripts/predict.py --weights /path/to/best.pt --source /path/to/images
-python scripts/model_info.py  # prints model complexity at 640x640: 4.342 M parameters, 20.911 GFLOPs
+python scripts/model_info.py
 python scripts/robustness_eval.py --weights /path/to/best.pt --data /path/to/data.yaml
 python scripts/full_image_inference.py --weights /path/to/best.pt --source /path/to/held_out_photos --strategy combined
 python evaluation/benchmark_model.py --weights /path/to/best.pt --data /path/to/data.yaml --output benchmark.json
 ```
 
-The full-image script implements the manuscript's 640×640 windows, 512-pixel stride, 0.45 class-wise NMS, and optional overview pass. `robustness_eval.py` applies the four reported perturbations to the test images and keeps labels unchanged.
+## Comparison Models
 
-Training figures must be generated from retained `results.csv` files rather than reconstructed values:
+Twelve comparison detectors (Faster R-CNN, SSD-MobileNetV2, YOLOv5n, YOLOv8n/s, YOLOv9t, YOLOv10n, YOLOv11n, YOLOv12n, RTMDet-tiny, RT-DETR-L/X) are documented under `comparisons/`. See that directory for the registry, shared protocol, and aggregation utilities.
 
-```bash
-python visualization/plot_training_curves.py --run YOLOv8n=/path/to/baseline/results.csv --run MFMD-YOLOv8=/path/to/mfmd/results.csv --output figures/training
+## Reproducibility and Documentation
+
+- `docs/METHOD_CODE_MAP.md` – paper-to-code mapping
+- `docs/REPRODUCIBILITY.md` – experimental protocol
+- `docs/PROVENANCE_MATRIX.md` – evidence status of each component
+- `docs/AUTHOR_CONFIRMATION_CHECKLIST.md` – unresolved items
+- `docs/RELEASE_CHECKLIST.md` – package contents and exclusions
+
+Materials are labelled by provenance (`manuscript_reported`, `reconstructed_from_manuscript`, `measured_run_pending`, `synthetic_smoke_test_only`). See `docs/PROVENANCE_MATRIX.md` for details.
+
+## Citation
+
+If you use this software or the associated paper, please cite:
+
+```bibtex
+@article{ding2026mfmd,
+  title={MFMD-YOLOv8: An Enhanced Lightweight Framework for Mongolian Furniture Motif Detection},
+  author={Ding, Anning and Qiu, Guohua and Li, Qing and Kang, Yongkang and He, Chao and Jiang, Qi and Duo, Huaqiong},
+  year={2026}
+}
 ```
 
-## Dataset and installation smoke test
+See also `CITATION.cff`.
 
-`dataset_tools/` contains ROI, VOC-to-YOLO, annotation validation, group split, leakage-check, and audited offline-augmentation utilities. Because the original image-level split is missing, `split_by_group.py` produces a new deterministic reconstruction and does not claim to restore the historical split.
+## License
 
-The synthetic example tests software only:
+This project retains the upstream AGPL-3.0 license of Ultralytics YOLOv8. See `LICENSE` and `THIRD_PARTY_NOTICES.md`.
 
-```bash
-python examples/smoke_test.py
-python -m pytest -p no:cacheprovider tests -q
-```
+## Acknowledgements
 
-Before publication, build a clean ZIP that excludes caches, checkpoints, datasets, and generated runs:
-
-```bash
-python scripts/audit_release.py --allow-generated
-python scripts/create_hash_manifest.py
-python scripts/build_release_archive.py
-```
-
-## Reproducibility notes
-
-See `docs/METHOD_CODE_MAP.md` for the paper-to-code map, `docs/REPRODUCIBILITY.md` for the protocol, `docs/PROVENANCE_MATRIX.md` for evidence status, `docs/AUTHOR_CONFIRMATION_CHECKLIST.md` for unresolved facts, `comparisons/README.md` for comparison-model status, and `docs/RELEASE_CHECKLIST.md` for the contents and exclusions of this package. The paper's private furniture dataset must be supplied locally under the stated copyright and access conditions.
+This work was supported by the Key Research and Development and Achievement Transformation Program of Inner Mongolia Autonomous Region, China (Grant No. 2023YFHH0022 and Grant No. 2022YFDZ0031).
