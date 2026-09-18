@@ -1,13 +1,18 @@
 # MFMD-YOLOv8
 
+[![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
+[![License](https://img.shields.io/badge/License-AGPL%203.0-green.svg)](LICENSE)
+[![GitHub](https://img.shields.io/badge/GitHub-iconJqr%2FMFMD--YOLOv8-blue?logo=github)](https://github.com/iconJqr/MFMD-YOLOv8)
+
 **MFMD-YOLOv8: An Enhanced Lightweight Framework for Mongolian Furniture Motif Detection**
 
-Official PyTorch reference implementation of MFMD-YOLOv8, a lightweight detector for animal, plant, and geometric motifs on traditional Mongolian painted furniture.
+Official reference implementation for reproducing the MFMD-YOLOv8 method.
 
-Built on YOLOv8n, the model integrates:
-- **RCS-OSA** for multi-scale feature aggregation and reuse
-- **Bi-Level Routing Attention (BRA)** for content-dependent spatial interaction
-- **Wise-IoU v3 (WIoU v3)** for dynamic non-monotonic bounding-box regression
+A lightweight detector for animal, plant, and geometric motifs on traditional Mongolian painted furniture. Built on YOLOv8n with three key modifications:
+
+- **RCS-OSA** — multi-scale feature aggregation and reuse
+- **Bi-Level Routing Attention (BRA)** — content-dependent spatial interaction
+- **Wise-IoU v3 (WIoU v3)** — dynamic non-monotonic bounding-box regression
 
 ## Key Results
 
@@ -52,42 +57,28 @@ dataset/
 2. **BRA** is inserted immediately after SPPF to perform content-dependent sparse attention, reducing interference from surface cracks, pigment loss, and dense ornamentation.
 3. **WIoU v3** provides non-monotonic weighting of regression errors according to relative prediction quality.
 
-The model contains 4,342,313 parameters and requires 20.911 GFLOPs at 640×640 input. Complexity is measured with standard `model.info(imgsz=640)`.
+The model contains 4,342,313 parameters and requires 20.911 GFLOPs at 640×640 input.
 
 ## Installation
-
-Use Python 3.10 with the PyTorch build appropriate for your CUDA installation:
 
 ```bash
 pip install -r requirements.txt
 pip install -e .
 ```
 
-The code is based on the Ultralytics YOLOv8 source included in this directory. The upstream AGPL-3.0 license is retained in `LICENSE`.
-
 ## Training
 
-COCO-pretrained YOLOv8n weights must be obtained separately (not included in this release).
-
-One MFMD-YOLOv8 run:
+COCO-pretrained YOLOv8n weights must be obtained separately.
 
 ```bash
+# Single seed
 python scripts/train.py --data /path/to/data.yaml --model mfmd_yolov8.yaml --iou-loss wiou_v3 --weights yolov8n.pt --seed 0
-```
 
-Three-seed training:
-
-```bash
+# Three seeds
 python scripts/train_three_seeds.py --data /path/to/data.yaml --model mfmd_yolov8.yaml --iou-loss wiou_v3 --weights yolov8n.pt
 ```
 
-For the baseline use `yolov8n_baseline.yaml` with `--iou-loss ciou`. Ablation combinations are listed in `configs/ablation.yaml` and can be launched with:
-
-```bash
-python scripts/train_ablation.py --data /path/to/data.yaml --experiment all --weights yolov8n.pt
-```
-
-The training script resets the WIoU v3 running mean for every independent run.
+Baseline: use `yolov8n_baseline.yaml` with `--iou-loss ciou`.
 
 ## Evaluation and Inference
 
@@ -95,28 +86,17 @@ The training script resets the WIoU v3 running mean for every independent run.
 python scripts/val.py --weights /path/to/best.pt --data /path/to/data.yaml --split test
 python scripts/predict.py --weights /path/to/best.pt --source /path/to/images
 python scripts/model_info.py
-python scripts/robustness_eval.py --weights /path/to/best.pt --data /path/to/data.yaml
 python scripts/full_image_inference.py --weights /path/to/best.pt --source /path/to/held_out_photos --strategy combined
-python evaluation/benchmark_model.py --weights /path/to/best.pt --data /path/to/data.yaml --output benchmark.json
 ```
 
-## Comparison Models
+## Documentation
 
-Twelve comparison detectors (Faster R-CNN, SSD-MobileNetV2, YOLOv5n, YOLOv8n/s, YOLOv9t, YOLOv10n, YOLOv11n, YOLOv12n, RTMDet-tiny, RT-DETR-L/X) are documented under `comparisons/`. See that directory for the registry, shared protocol, and aggregation utilities.
-
-## Reproducibility and Documentation
-
-- `docs/METHOD_CODE_MAP.md` – paper-to-code mapping
-- `docs/REPRODUCIBILITY.md` – experimental protocol
-- `docs/PROVENANCE_MATRIX.md` – evidence status of each component
-- `docs/AUTHOR_CONFIRMATION_CHECKLIST.md` – unresolved items
-- `docs/RELEASE_CHECKLIST.md` – package contents and exclusions
-
-Materials are labelled by provenance (`manuscript_reported`, `reconstructed_from_manuscript`, `measured_run_pending`, `synthetic_smoke_test_only`). See `docs/PROVENANCE_MATRIX.md` for details.
+- `docs/METHOD_CODE_MAP.md` — paper-to-code mapping
+- `docs/REPRODUCIBILITY.md` — experimental protocol
+- `docs/PROVENANCE_MATRIX.md` — evidence status
+- `comparisons/` — comparison models and protocols
 
 ## Citation
-
-If you use this software or the associated paper, please cite:
 
 ```bibtex
 @article{ding2026mfmd,
@@ -126,11 +106,9 @@ If you use this software or the associated paper, please cite:
 }
 ```
 
-See also `CITATION.cff`.
-
 ## License
 
-This project retains the upstream AGPL-3.0 license of Ultralytics YOLOv8. See `LICENSE` and `THIRD_PARTY_NOTICES.md`.
+AGPL-3.0 (retained from Ultralytics YOLOv8). See `LICENSE` and `THIRD_PARTY_NOTICES.md`.
 
 ## Acknowledgements
 
