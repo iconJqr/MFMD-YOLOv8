@@ -1,0 +1,36 @@
+provenance: reconstructed_from_manuscript_table_2
+seed: 42
+outputs_per_original: 3
+canvas_size: 640
+box_filter:
+  minimum_retained_area_ratio: 0.20
+  minimum_width_pixels: 10
+  minimum_height_pixels: 10
+operations:
+  hsv:
+    probability: 0.80
+    hue_shift_degrees: [-14, 14]
+    saturation_scale: [0.75, 1.25]
+    value_scale: [0.80, 1.20]
+  translation_scaling:
+    probability: 0.60
+    translation_fraction: [-0.12, 0.12]
+    scale_factor: [0.78, 1.22]
+  horizontal_flip:
+    probability: 0.50
+  randaugment:
+    probability: 0.50
+    number_of_operations: 2
+    operations: [brightness, contrast, sharpness, shear]
+    manuscript_magnitude: 0.35
+    reconstruction_note: The lost implementation's magnitude-to-operation mapping cannot be recovered from the paper alone.
+  random_erasing:
+    probability: 0.30
+    area_ratio: [0.02, 0.15]
+    aspect_ratio: [0.35, 2.80]
+    fill: image_pixel_mean
+  mosaic:
+    probability: 0.40
+    images: 4
+    center_fraction: [0.38, 0.62]
+    reconstruction_note: The original source-selection and crop-placement implementation is missing.

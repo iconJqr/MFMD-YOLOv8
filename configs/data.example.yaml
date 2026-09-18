@@ -1,0 +1,11 @@
+# Replace path with the root of the locally prepared YOLO-format dataset.
+path: /path/to/mfmd_dataset
+train: images/train
+val: images/val
+test: images/test
+
+# Class-index order used by the released code and annotations.
+names:
+  0: geometry
+  1: animal
+  2: plant

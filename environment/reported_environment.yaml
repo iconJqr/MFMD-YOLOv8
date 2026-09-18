@@ -1,0 +1,17 @@
+# Values transcribed from the manuscript; they are not a lock file.
+provenance: manuscript_reported
+status: pending_author_confirmation_against_final_training_machine
+operating_system: Windows 10 Pro
+python: 3.10.19
+pytorch: 2.5.1
+cuda: 12.1
+cudnn: 9.1
+gpu: NVIDIA GeForce RTX 4060 Ti 8 GB
+ultralytics_reported: 8.1.34
+ultralytics_bundled_source: 8.0.166
+known_conflict: >-
+  The manuscript version and bundled source version differ. Do not claim an
+  exact environment reproduction until the final experiment snapshot is found.
+installation_note: >-
+  Install a PyTorch/CUDA pair supported by the local GPU. requirements.txt uses
+  ranges because the original package lock was not retained.

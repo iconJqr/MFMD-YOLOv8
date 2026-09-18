@@ -1,0 +1,5 @@
+split,source_groups,furniture_items,original_roi_images,animal_instances,plant_instances,geometry_instances,provenance
+train,179,190,1051,583,1026,784,manuscript_table_1
+validation,22,24,138,68,132,101,manuscript_table_1
+internal_test,23,23,131,65,135,98,manuscript_table_1
+total,224,237,1320,716,1293,983,manuscript_table_1

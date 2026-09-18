@@ -1,0 +1,9 @@
+# Architecture/loss combinations corresponding to the eight ablation rows.
+exp1: {model: yolov8n_baseline.yaml, rcs_osa: false, bra: false, iou_loss: ciou}
+exp2: {model: yolov8n_rcsosa.yaml, rcs_osa: true, bra: false, iou_loss: ciou}
+exp3: {model: yolov8n_bra.yaml, rcs_osa: false, bra: true, iou_loss: ciou}
+exp4: {model: yolov8n_baseline.yaml, rcs_osa: false, bra: false, iou_loss: wiou_v3}
+exp5: {model: mfmd_yolov8.yaml, rcs_osa: true, bra: true, iou_loss: ciou}
+exp6: {model: yolov8n_rcsosa.yaml, rcs_osa: true, bra: false, iou_loss: wiou_v3}
+exp7: {model: yolov8n_bra.yaml, rcs_osa: false, bra: true, iou_loss: wiou_v3}
+exp8: {model: mfmd_yolov8.yaml, rcs_osa: true, bra: true, iou_loss: wiou_v3}

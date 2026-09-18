@@ -1,0 +1,9 @@
+yolov8n_baseline:
+  P3: 15
+  P4: 18
+  P5: 21
+mfmd_yolov8:
+  P3: 16
+  P4: 19
+  P5: 22
+fusion: arithmetic_mean_of_independently_normalized_maps

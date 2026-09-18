@@ -1,0 +1,4 @@
+source_group_id,furniture_id,image_id,image_path,label_path,geometry_count,animal_count,plant_count,split
+G001,F001,ROI_000001,images/ROI_000001.png,labels/ROI_000001.txt,1,0,2,train
+G002,F002,ROI_000002,images/ROI_000002.png,labels/ROI_000002.txt,0,1,1,val
+G003,F003,ROI_000003,images/ROI_000003.png,labels/ROI_000003.txt,2,0,0,test

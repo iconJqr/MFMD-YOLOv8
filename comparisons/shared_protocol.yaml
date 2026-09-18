@@ -1,0 +1,35 @@
+dataset:
+  format: YOLO bounding boxes, converted only when required by an external framework
+  classes: [geometry, animal, plant]
+  input_size: [640, 640]
+  partition: fixed source-group-disjoint train/validation/internal-test split
+  train_original_images: 1051
+  train_offline_augmented_images: 3153
+  validation_images: 138
+  internal_test_images: 131
+  online_augmentation: false
+
+repeated_runs:
+  seeds: [0, 1, 42]
+  maximum_epochs: 300
+  early_stopping_patience: 50
+  checkpoint_selection_split: validation
+  checkpoint_selection_fitness: 0.1 * mAP50 + 0.9 * mAP50_95
+  forbidden_for_selection: [internal_test, independent_full_image_test]
+
+evaluation:
+  metrics: [precision, recall, mAP50, mAP50_95]
+  aggregation: mean and sample standard deviation across the three training seeds
+  params_unit: million parameters
+  flops_unit: GFLOPs at 640x640 input
+  fps_batch_size: 1
+  fps_device: NVIDIA GeForce RTX 4060 Ti 8 GB
+  note: preprocessing, warm-up, synchronization, and timing scope must match across models
+
+software_reported_by_manuscript:
+  os: Windows 10 Pro
+  python: 3.10.19
+  pytorch: 2.5.1
+  cuda: 12.1
+  cudnn: 9.1
+  ultralytics_for_yolov8_and_modified_models: 8.1.34

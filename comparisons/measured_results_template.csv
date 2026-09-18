@@ -1,0 +1,40 @@
+model,seed,precision,recall,map50,map50_95,params_m,gflops,fps,checkpoint,repository_commit,provenance
+Faster R-CNN,0,,,,,,,,,,measured_run_pending
+Faster R-CNN,1,,,,,,,,,,measured_run_pending
+Faster R-CNN,42,,,,,,,,,,measured_run_pending
+SSD-MobileNetV2,0,,,,,,,,,,measured_run_pending
+SSD-MobileNetV2,1,,,,,,,,,,measured_run_pending
+SSD-MobileNetV2,42,,,,,,,,,,measured_run_pending
+YOLOv5n,0,,,,,,,,,,measured_run_pending
+YOLOv5n,1,,,,,,,,,,measured_run_pending
+YOLOv5n,42,,,,,,,,,,measured_run_pending
+YOLOv8n,0,,,,,,,,,,measured_run_pending
+YOLOv8n,1,,,,,,,,,,measured_run_pending
+YOLOv8n,42,,,,,,,,,,measured_run_pending
+YOLOv8s,0,,,,,,,,,,measured_run_pending
+YOLOv8s,1,,,,,,,,,,measured_run_pending
+YOLOv8s,42,,,,,,,,,,measured_run_pending
+YOLOv9t,0,,,,,,,,,,measured_run_pending
+YOLOv9t,1,,,,,,,,,,measured_run_pending
+YOLOv9t,42,,,,,,,,,,measured_run_pending
+YOLOv10n,0,,,,,,,,,,measured_run_pending
+YOLOv10n,1,,,,,,,,,,measured_run_pending
+YOLOv10n,42,,,,,,,,,,measured_run_pending
+YOLOv11n,0,,,,,,,,,,measured_run_pending
+YOLOv11n,1,,,,,,,,,,measured_run_pending
+YOLOv11n,42,,,,,,,,,,measured_run_pending
+YOLOv12n,0,,,,,,,,,,measured_run_pending
+YOLOv12n,1,,,,,,,,,,measured_run_pending
+YOLOv12n,42,,,,,,,,,,measured_run_pending
+RTMDet-tiny,0,,,,,,,,,,measured_run_pending
+RTMDet-tiny,1,,,,,,,,,,measured_run_pending
+RTMDet-tiny,42,,,,,,,,,,measured_run_pending
+RT-DETR-L,0,,,,,,,,,,measured_run_pending
+RT-DETR-L,1,,,,,,,,,,measured_run_pending
+RT-DETR-L,42,,,,,,,,,,measured_run_pending
+RT-DETR-X,0,,,,,,,,,,measured_run_pending
+RT-DETR-X,1,,,,,,,,,,measured_run_pending
+RT-DETR-X,42,,,,,,,,,,measured_run_pending
+MFMD-YOLOv8,0,,,,,,,,,,measured_run_pending
+MFMD-YOLOv8,1,,,,,,,,,,measured_run_pending
+MFMD-YOLOv8,42,,,,,,,,,,measured_run_pending

@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the MFMD-YOLOv8 article."
+title: "MFMD-YOLOv8: An Enhanced Lightweight Framework for Mongolian Furniture Motif Detection"
+type: software
+authors:
+  - family-names: Ding
+    given-names: Anning
+  - family-names: Qiu
+    given-names: Guohua
+  - family-names: Li
+    given-names: Qing
+  - family-names: Kang
+    given-names: Yongkang
+  - family-names: He
+    given-names: Chao
+  - family-names: Jiang
+    given-names: Qi
+  - family-names: Duo
+    given-names: Huaqiong
+license: AGPL-3.0-only
+repository-code: "https://github.com/iconJqr/MFMD-YOLOv8"
