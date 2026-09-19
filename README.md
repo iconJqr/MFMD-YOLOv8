@@ -96,6 +96,15 @@ python scripts/full_image_inference.py --weights /path/to/best.pt --source /path
 - `docs/PROVENANCE_MATRIX.md` — evidence status
 - `comparisons/` — comparison models and protocols
 
+## Uploading Images to This Repository
+
+If you want to upload images for documentation or examples:
+
+1. Put image files in `assets/images/`.
+2. Compress large images before committing to keep repository size manageable.
+3. Reference images in markdown using relative paths, for example:
+   `![Sample figure](assets/images/sample-figure.png)`.
+
 ## Citation
 
 ```bibtex
