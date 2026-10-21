@@ -4,35 +4,35 @@ models:
   faster_rcnn:
     paper_name: Faster R-CNN
     family: two-stage CNN
-    upstream_repository: pending_author_confirmation
-    upstream_version_or_commit: pending_author_confirmation
-    model_entrypoint: pending_author_confirmation
-    optimizer: pending_author_confirmation
-    status: pending_author_confirmation
+    upstream_repository: not_recorded_in_release
+    upstream_version_or_commit: not_recorded_in_release
+    model_entrypoint: not_recorded_in_release
+    optimizer: SGD (lr0=0.01, momentum=0.90, weight_decay=0.0005), as reported
+    status: source_details_not_recorded
     paper_params_m: 41.5
     paper_gflops: 205.2
-    note: The paper does not identify the backbone/FPN implementation; do not assume a torchvision variant without the original run record.
+    note: The paper does not identify the backbone/FPN implementation; the original model configuration is needed to select the exact variant.
 
   ssd_mobilenet_v2:
     paper_name: SSD-MobileNetV2
     family: single-stage CNN
-    upstream_repository: pending_author_confirmation
-    upstream_version_or_commit: pending_author_confirmation
-    model_entrypoint: pending_author_confirmation
-    optimizer: pending_author_confirmation
-    status: pending_author_confirmation
+    upstream_repository: not_recorded_in_release
+    upstream_version_or_commit: not_recorded_in_release
+    model_entrypoint: not_recorded_in_release
+    optimizer: SGD (lr0=0.01, momentum=0.90, weight_decay=0.0005), as reported
+    status: source_details_not_recorded
     paper_params_m: 4.3
     paper_gflops: 1.5
-    note: The exact SSD head, MobileNetV2 implementation, and input adaptation require the original experiment configuration.
+    note: The exact SSD head, MobileNetV2 implementation, and input adaptation are not specified in the manuscript.
 
   yolov5n:
     paper_name: YOLOv5n
     family: Ultralytics YOLO
     upstream_repository: https://github.com/ultralytics/yolov5
-    upstream_version_or_commit: v7.0 cited in the manuscript; final experiment commit pending confirmation
+    upstream_version_or_commit: v7.0 cited in the manuscript; final experiment commit not recorded in release
     model_entrypoint: yolov5n
     api: repository train.py
-    optimizer: pending_author_confirmation
+    optimizer: SGD (lr0=0.01, momentum=0.937, weight_decay=0.0005), as reported
     status: partially_verified
     paper_params_m: 1.8
     paper_gflops: 4.1
@@ -41,10 +41,10 @@ models:
     paper_name: YOLOv8n
     family: Ultralytics YOLO
     upstream_repository: https://github.com/ultralytics/ultralytics
-    upstream_version_or_commit: 8.1.34 reported by manuscript; final code snapshot pending confirmation
+    upstream_version_or_commit: 8.0.166 reported by manuscript; final code snapshot not recorded in release
     model_entrypoint: yolov8n.pt
     api: YOLO
-    optimizer: SGD
+    optimizer: SGD (lr0=0.01, momentum=0.937, weight_decay=0.0005), as reported
     status: partially_verified
     paper_params_m: 3.0
     paper_gflops: 8.2
@@ -53,10 +53,10 @@ models:
     paper_name: YOLOv8s
     family: Ultralytics YOLO
     upstream_repository: https://github.com/ultralytics/ultralytics
-    upstream_version_or_commit: 8.1.34 reported by manuscript; final code snapshot pending confirmation
+    upstream_version_or_commit: 8.0.166 reported by manuscript; final code snapshot not recorded in release
     model_entrypoint: yolov8s.pt
     api: YOLO
-    optimizer: SGD
+    optimizer: SGD (lr0=0.01, momentum=0.937, weight_decay=0.0005), as reported
     status: partially_verified
     paper_params_m: 11.1
     paper_gflops: 28.6
@@ -64,11 +64,11 @@ models:
   yolov9t:
     paper_name: YOLOv9t
     family: YOLO
-    upstream_repository: pending_author_confirmation
-    upstream_version_or_commit: pending_author_confirmation
-    model_entrypoint: yolov9t.yaml candidate found in a local code tree
-    optimizer: pending_author_confirmation
-    status: candidate_from_local_code
+    upstream_repository: not_recorded_in_release
+    upstream_version_or_commit: not_recorded_in_release
+    model_entrypoint: yolov9t.yaml (candidate entrypoint)
+    optimizer: SGD (lr0=0.01, momentum=0.937, weight_decay=0.0005), as reported
+    status: candidate_entrypoint
     paper_params_m: 2.1
     paper_gflops: 7.7
 
@@ -76,11 +76,11 @@ models:
     paper_name: YOLOv10n
     family: YOLO
     upstream_repository: https://github.com/THU-MIG/yolov10
-    upstream_version_or_commit: pending_author_confirmation
-    model_entrypoint: yolov10n.yaml candidate found in a local Ultralytics 8.1.34-derived code tree
+    upstream_version_or_commit: not_recorded_in_release
+    model_entrypoint: yolov10n.yaml (candidate entrypoint)
     api: YOLOv10 candidate
-    optimizer: pending_author_confirmation
-    status: candidate_from_local_code
+    optimizer: SGD (lr0=0.01, momentum=0.937, weight_decay=0.0005), as reported
+    status: candidate_entrypoint
     paper_params_m: 2.7
     paper_gflops: 8.2
 
@@ -88,23 +88,23 @@ models:
     paper_name: YOLOv11n
     family: Ultralytics YOLO
     upstream_repository: https://github.com/ultralytics/ultralytics
-    upstream_version_or_commit: local candidate tree reports 8.3.138; final experiment commit pending confirmation
+    upstream_version_or_commit: Ultralytics 8.3.138 candidate; final experiment commit not recorded in release
     model_entrypoint: yolo11n.pt
     api: YOLO
-    optimizer: pending_author_confirmation
-    status: candidate_from_local_code
+    optimizer: SGD (lr0=0.01, momentum=0.937, weight_decay=0.0005), as reported
+    status: candidate_entrypoint
     paper_params_m: 2.6
     paper_gflops: 6.3
 
   yolov12n:
     paper_name: YOLOv12n
     family: YOLO
-    upstream_repository: pending_author_confirmation
-    upstream_version_or_commit: local candidate tree reports Ultralytics 8.3.138; YOLOv12 source/commit pending confirmation
-    model_entrypoint: yolo12n.pt candidate
+    upstream_repository: not_recorded_in_release
+    upstream_version_or_commit: Ultralytics 8.3.138 candidate; YOLOv12 source/commit not recorded in release
+    model_entrypoint: yolo12n.pt (candidate entrypoint)
     api: YOLO candidate
-    optimizer: pending_author_confirmation
-    status: candidate_from_local_code
+    optimizer: SGD (lr0=0.01, momentum=0.937, weight_decay=0.0005), as reported
+    status: candidate_entrypoint
     paper_params_m: 2.6
     paper_gflops: 6.3
 
@@ -112,10 +112,10 @@ models:
     paper_name: RTMDet-tiny
     family: MMDetection single-stage CNN
     upstream_repository: https://github.com/open-mmlab/mmdetection
-    upstream_version_or_commit: pending_author_confirmation
-    model_entrypoint: rtmdet_tiny configuration pending confirmation
-    optimizer: pending_author_confirmation
-    status: pending_author_confirmation
+    upstream_version_or_commit: not_recorded_in_release
+    model_entrypoint: not_recorded_in_release
+    optimizer: AdamW (lr0=0.001, weight_decay=0.0001), as reported
+    status: source_details_not_recorded
     paper_params_m: 4.8
     paper_gflops: 8.3
 
@@ -123,10 +123,10 @@ models:
     paper_name: RT-DETR-L
     family: transformer detector
     upstream_repository: https://github.com/ultralytics/ultralytics
-    upstream_version_or_commit: pending_author_confirmation
+    upstream_version_or_commit: not_recorded_in_release
     model_entrypoint: rtdetr-l.pt candidate
     api: RTDETR
-    optimizer: AdamW reported as transformer best practice; exact settings pending confirmation
+    optimizer: AdamW (lr0=0.0001, weight_decay=0.0001), as reported
     status: partially_verified
     paper_params_m: 31.9
     paper_gflops: 103.5
@@ -135,10 +135,10 @@ models:
     paper_name: RT-DETR-X
     family: transformer detector
     upstream_repository: https://github.com/ultralytics/ultralytics
-    upstream_version_or_commit: pending_author_confirmation
+    upstream_version_or_commit: not_recorded_in_release
     model_entrypoint: rtdetr-x.pt candidate
     api: RTDETR
-    optimizer: AdamW reported as transformer best practice; exact settings pending confirmation
+    optimizer: AdamW (lr0=0.0001, weight_decay=0.0001), as reported
     status: partially_verified
     paper_params_m: 65.5
     paper_gflops: 222.5

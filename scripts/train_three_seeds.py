@@ -7,6 +7,11 @@ import subprocess
 import sys
 from pathlib import Path
 
+import yaml
+
+
+ROOT = Path(__file__).resolve().parents[1]
+
 
 def main() -> None:
     parser = argparse.ArgumentParser()
@@ -19,8 +24,9 @@ def main() -> None:
     parser.add_argument("--project", default="runs/paper")
     args = parser.parse_args()
 
+    protocol = yaml.safe_load((ROOT / "configs" / "train_paper.yaml").read_text(encoding="utf-8"))
     script = Path(__file__).with_name("train.py")
-    for seed in (0, 1, 42):
+    for seed in protocol["seeds"]:
         command = [
             sys.executable, str(script), "--data", args.data, "--model", args.model,
             "--iou-loss", args.iou_loss, "--weights", args.weights, "--device", args.device,

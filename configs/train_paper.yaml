@@ -1,4 +1,5 @@
 # Shared training settings reported in the manuscript.
+seeds: [0, 1, 42]
 epochs: 300
 patience: 50
 batch: 8
@@ -9,13 +10,24 @@ lrf: 0.01
 momentum: 0.937
 weight_decay: 0.0005
 warmup_epochs: 3.0
+warmup_momentum: 0.8
+warmup_bias_lr: 0.1
 cos_lr: true
 amp: true
 deterministic: true
+# The manuscript specifies this candidate confidence for evaluation.
+conf: 0.25
+# ROI NMS IoU threshold reported in the manuscript.
+iou: 0.5
+# Target assignment implementation used by this repository.
 assigner: task_aligned
+# Ultralytics detection-loss gains.
 box: 7.5
 cls: 0.5
 dfl: 1.5
+bra_topk: 4
+wiou_gamma: 1.9
+wiou_delta: 3.0
 
 # Offline augmentation was prepared once and reused. Disable online transforms.
 hsv_h: 0.0
@@ -31,4 +43,7 @@ fliplr: 0.0
 mosaic: 0.0
 mixup: 0.0
 copy_paste: 0.0
+# Recorded explicitly for the paper protocol; these are not detection trainer arguments.
+erasing: 0.0
+auto_augment: null
 close_mosaic: 0

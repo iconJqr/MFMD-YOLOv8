@@ -18,8 +18,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--repo", type=Path, required=True, help="Trusted upstream repository checkout")
     parser.add_argument("--data", type=Path, required=True)
     parser.add_argument("--model", required=True, help="Upstream model YAML or pretrained checkpoint identifier")
+    parser.add_argument("--weights", help="Explicit official COCO checkpoint when --model is an architecture YAML")
     parser.add_argument("--api", choices=("YOLO", "RTDETR", "YOLOv10"), default="YOLO")
-    parser.add_argument("--optimizer", required=True, help="Optimizer used by the confirmed original experiment")
+    parser.add_argument("--optimizer", required=True, help="Optimizer reported for this model family in manuscript Table 4")
     parser.add_argument("--device", default="0")
     parser.add_argument("--workers", type=int, default=8)
     parser.add_argument("--batch", type=int, default=8)
@@ -27,11 +28,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--patience", type=int, default=50)
     parser.add_argument("--project", default="runs/comparisons")
     parser.add_argument("--name", default=None)
-    parser.add_argument("--lr0", type=float)
-    parser.add_argument("--weight-decay", type=float)
+    parser.add_argument("--lr0", type=float, required=True)
+    parser.add_argument("--weight-decay", type=float, required=True)
     parser.add_argument("--momentum", type=float)
-    parser.add_argument("--cos-lr", action="store_true")
-    return parser.parse_args()
+    parser.add_argument("--cos-lr", action=argparse.BooleanOptionalAction, default=True)
+    args = parser.parse_args()
+    if args.optimizer.upper() == "SGD" and args.momentum is None:
+        parser.error("--momentum is required for SGD so the Table 4 value is explicit")
+    return args
 
 
 def git_commit(repository: Path) -> str:
@@ -62,6 +66,10 @@ def main() -> None:
 
     for seed in (0, 1, 42):
         model = api_class(args.model)
+        if args.weights:
+            model.load(args.weights)
+        elif args.model.lower().endswith((".yaml", ".yml")):
+            raise ValueError("The manuscript initializes every detector from COCO weights; pass --weights for YAML models.")
         overrides = {
             "data": str(args.data.resolve()),
             "imgsz": 640,
@@ -71,12 +79,21 @@ def main() -> None:
             "seed": seed,
             "deterministic": True,
             "optimizer": args.optimizer,
+            "lr0": args.lr0,
+            "lrf": 0.01,
+            "weight_decay": args.weight_decay,
+            "warmup_epochs": 3.0,
+            "warmup_momentum": 0.8,
+            "warmup_bias_lr": 0.1,
+            "conf": 0.25,
             "device": args.device,
             "workers": args.workers,
             "project": args.project,
             "name": args.name or f"{Path(args.model).stem}_seed{seed}",
             "amp": True,
+            "pretrained": bool(args.weights or args.model.lower().endswith(".pt")),
             "cos_lr": args.cos_lr,
+            "iou": 0.50,
             "hsv_h": 0.0,
             "hsv_s": 0.0,
             "hsv_v": 0.0,
@@ -92,10 +109,6 @@ def main() -> None:
             "copy_paste": 0.0,
             "close_mosaic": 0,
         }
-        if args.lr0 is not None:
-            overrides["lr0"] = args.lr0
-        if args.weight_decay is not None:
-            overrides["weight_decay"] = args.weight_decay
         if args.momentum is not None:
             overrides["momentum"] = args.momentum
         model.train(**overrides)

@@ -1,4 +1,4 @@
-"""Reconstruct a deterministic source-group-aware train/val/test allocation.
+"""Reconstruct a deterministic greedy source-group-aware train/val/test allocation.
 
 This is a replacement implementation based on the manuscript, not the lost
 original split script. An existing split column is never silently overwritten.
@@ -30,6 +30,12 @@ def main() -> None:
     if any(row.get("split", "").strip() for row in rows):
         raise ValueError("input already contains split assignments; clear them explicitly before reconstruction")
 
+    if any(not row.get("source_group_id", "").strip() for row in rows):
+        raise ValueError("Every ROI row must have a non-empty source_group_id.")
+    roi_key = "roi_id" if "roi_id" in rows[0] else "image_path" if "image_path" in rows[0] else None
+    if roi_key and len({row[roi_key] for row in rows}) != len(rows):
+        raise ValueError(f"Manifest field {roi_key!r} must uniquely identify each ROI row.")
+
     grouped: dict[str, list[dict[str, str]]] = defaultdict(list)
     for row in rows:
         grouped[row["source_group_id"]].append(row)
@@ -48,11 +54,12 @@ def main() -> None:
     randomizer.shuffle(groups)
     groups.sort(key=lambda group: sum(vectors[group][name] / max(totals[name], 1) for name in FEATURES), reverse=True)
 
-    def objective(split: str, vector: dict[str, int]) -> float:
+    def objective(candidate: str, vector: dict[str, int]) -> float:
         score = 0.0
-        for name in FEATURES:
-            future = assigned[split][name] + vector[name]
-            score += ((future - targets[split][name]) / max(targets[split][name], 1)) ** 2
+        for split in RATIOS:
+            for name in FEATURES:
+                future = assigned[split][name] + (vector[name] if split == candidate else 0)
+                score += ((future - targets[split][name]) / max(targets[split][name], 1)) ** 2
         return score
 
     for group in groups:

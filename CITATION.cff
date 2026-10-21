@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite the MFMD-YOLOv8 article."
-title: "MFMD-YOLOv8: An Enhanced Lightweight Framework for Mongolian Furniture Motif Detection"
+title: "MFMD-YOLOv8: An Enhanced Detection Framework for Traditional Mongolian Furniture Motifs"
 type: software
 authors:
   - family-names: Ding

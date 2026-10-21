@@ -24,10 +24,11 @@ def main() -> None:
     args = parser.parse_args()
 
     experiments = yaml.safe_load((ROOT / "configs" / "ablation.yaml").read_text(encoding="utf-8"))
+    protocol = yaml.safe_load((ROOT / "configs" / "train_paper.yaml").read_text(encoding="utf-8"))
     selected = experiments if args.experiment == "all" else {args.experiment: experiments[args.experiment]}
     script = Path(__file__).with_name("train.py")
     for exp_name, exp in selected.items():
-        for seed in (0, 1, 42):
+        for seed in protocol["seeds"]:
             command = [
                 sys.executable, str(script), "--data", args.data, "--model", exp["model"],
                 "--iou-loss", exp["iou_loss"], "--weights", args.weights, "--device", args.device,

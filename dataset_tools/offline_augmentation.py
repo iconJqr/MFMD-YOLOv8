@@ -165,14 +165,31 @@ def main() -> None:
     parser.add_argument("--config", type=Path, default=Path("configs/offline_augmentation_reconstructed.yaml"))
     args = parser.parse_args()
     config = yaml.safe_load(args.config.read_text(encoding="utf-8"))
+    source_root, output_root = args.dataset.resolve(), args.output.resolve()
+    if output_root == source_root or source_root in output_root.parents or output_root in source_root.parents:
+        raise ValueError("The augmentation output must be a separate directory outside the source dataset.")
     rng = random.Random(config["seed"])
-    source_images = sorted(p for p in (args.dataset / "images" / "train").iterdir() if p.suffix.lower() in IMAGE_EXTENSIONS)
-    image_out, label_out = args.output / "images" / "train", args.output / "labels" / "train"
+    source_images = sorted(p for p in (source_root / "images" / "train").iterdir()
+                           if p.suffix.lower() in IMAGE_EXTENSIONS)
+    stems = [path.stem for path in source_images]
+    if len(stems) != len(set(stems)):
+        raise ValueError("Training image basenames must be unique because labels and augmented names use image stems.")
+    for split in ("val", "test"):
+        for kind in ("images", "labels"):
+            source_dir = source_root / kind / split
+            if not source_dir.is_dir():
+                raise FileNotFoundError(f"Expected unchanged {split} directory: {source_dir}")
+            destination = output_root / kind / split
+            destination.mkdir(parents=True, exist_ok=True)
+            for source_file in source_dir.iterdir():
+                if source_file.is_file():
+                    shutil.copy2(source_file, destination / source_file.name)
+    image_out, label_out = output_root / "images" / "train", output_root / "labels" / "train"
     image_out.mkdir(parents=True, exist_ok=True)
     label_out.mkdir(parents=True, exist_ok=True)
     audit = []
     for source in source_images:
-        label = args.dataset / "labels" / "train" / f"{source.stem}.txt"
+        label = source_root / "labels" / "train" / f"{source.stem}.txt"
         if not label.exists():
             raise FileNotFoundError(label)
         shutil.copy2(source, image_out / source.name)
@@ -186,7 +203,7 @@ def main() -> None:
         for index in range(1, int(config["outputs_per_original"]) + 1):
             if rng.random() < config["operations"]["mosaic"]["probability"] and len(source_images) >= 4:
                 others = [path for path in source_images if path != source]
-                image, boxes, mosaic_sources = mosaic(source, others, args.dataset, rng)
+                image, boxes, mosaic_sources = mosaic(source, others, source_root, rng)
                 prefix = ["mosaic:" + "+".join(mosaic_sources)]
             else:
                 image, boxes, prefix = base.copy(), original_boxes.copy(), []
@@ -196,7 +213,7 @@ def main() -> None:
             cv2.imwrite(str(image_out / f"{stem}.png"), image)
             save_boxes(label_out / f"{stem}.txt", boxes, 640, 640)
             audit.append({"source": source.name, "output": f"{stem}.png", "operations": "|".join(operations)})
-    with (args.output / "augmentation_audit.csv").open("w", encoding="utf-8", newline="") as stream:
+    with (output_root / "augmentation_audit.csv").open("w", encoding="utf-8", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=("source", "output", "operations"))
         writer.writeheader()
         writer.writerows(audit)

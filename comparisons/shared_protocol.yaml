@@ -3,11 +3,13 @@ dataset:
   classes: [geometry, animal, plant]
   input_size: [640, 640]
   partition: fixed source-group-disjoint train/validation/internal-test split
+  split_target: 8:1:1, source-group allocation seed 42
   train_original_images: 1051
   train_offline_augmented_images: 3153
   validation_images: 138
   internal_test_images: 131
   online_augmentation: false
+  offline_augmentation_policy: manuscript Table 2, fixed collection reused for all models; original image files unavailable
 
 repeated_runs:
   seeds: [0, 1, 42]
@@ -19,10 +21,18 @@ repeated_runs:
 
 evaluation:
   metrics: [precision, recall, mAP50, mAP50_95]
+  confidence_threshold: 0.25
+  roi_nms_iou: 0.50
+  precision_recall: fixed operating point from confidence 0.25 and matching IoU 0.50
+  full_image_tile_nms_iou: 0.50
+  full_image_global_classwise_nms_iou: 0.45
   aggregation: mean and sample standard deviation across the three training seeds
   params_unit: million parameters
   flops_unit: GFLOPs at 640x640 input
   fps_batch_size: 1
+  roi_fps_warmup_iterations: 50
+  roi_fps_timing_scope: forward propagation plus GPU-side NMS; exclude disk I/O
+  full_image_timing_scope: preprocessing, transfer, inference, coordinate remapping, post-processing; exclude disk I/O
   fps_device: NVIDIA GeForce RTX 4060 Ti 8 GB
   note: preprocessing, warm-up, synchronization, and timing scope must match across models
 
@@ -32,4 +42,4 @@ software_reported_by_manuscript:
   pytorch: 2.5.1
   cuda: 12.1
   cudnn: 9.1
-  ultralytics_for_yolov8_and_modified_models: 8.1.34
+  ultralytics_for_yolov8_and_modified_models: 8.0.166

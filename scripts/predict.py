@@ -19,7 +19,7 @@ def main() -> None:
     parser.add_argument("--name", default="mfmd")
     args = parser.parse_args()
     YOLO(args.weights).predict(
-        source=args.source, imgsz=640, conf=args.conf, device=args.device,
+        source=args.source, imgsz=640, conf=args.conf, iou=0.50, device=args.device,
         save=True, project=args.project, name=args.name)
 
 

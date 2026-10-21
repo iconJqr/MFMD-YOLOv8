@@ -217,6 +217,8 @@ class v8DetectionLoss:
             raise ValueError(
                 f"Unsupported assigner={self.assigner_name!r}; use 'task_aligned' or 'atss'.")
         if self.iou_loss == 'wiou_v3':
+            WIoU_Scale.configure(
+                getattr(h, 'wiou_gamma', 1.9), getattr(h, 'wiou_delta', 3.0))
             WIoU_Scale.reset()
         self.bbox_loss = BboxLoss(
             m.reg_max - 1, use_dfl=self.use_dfl, iou_loss=self.iou_loss).to(device)

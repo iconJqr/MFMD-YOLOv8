@@ -9,17 +9,17 @@ This directory documents the 12 comparison detectors reported in the manuscript.
 - `paper_reported_results.csv`: the values transcribed from the manuscript; these are reference values, not newly generated outputs.
 - `scripts/train_ultralytics_external.py`: launcher for comparison models implemented by an external Ultralytics checkout.
 - `scripts/aggregate_three_seeds.py`: computes mean and sample standard deviation from three per-seed result rows.
-- `scripts/validate_registry.py`: checks that all 12 comparison models are represented and that unresolved provenance remains explicitly marked.
+- `scripts/validate_registry.py`: checks that all 12 comparison models are represented and that source metadata is explicit.
 - `THIRD_PARTY_CODE.md`: repository and licensing guidance.
 
 ## Important status distinction
 
-`verified_from_manuscript` means that the manuscript directly states the value. `candidate_from_local_code` means that a matching model/configuration was found in a local code tree, but no final furniture-dataset run record established that it produced the manuscript table. `pending_author_confirmation` means that the exact implementation, version, or optimizer must be recovered from the original experiment before claiming exact reproducibility.
+`partially_verified` and `candidate_entrypoint` distinguish model details stated in the manuscript from a candidate public entrypoint. `source_details_not_recorded` means the repository, revision, or entrypoint is not identified in this release. Optimizer settings in the registry are transcribed from Table 4.
 
-The release therefore separates two goals:
+The registry separates two goals:
 
 1. transparent disclosure of every detector reported in the paper; and
-2. exact executable reproduction, which is possible only after the original repository commit, configuration, and three seed logs are confirmed.
+2. executable reproduction, using the source revision, configuration, and three seeds recorded for each new run.
 
 ## External Ultralytics models
 
@@ -32,9 +32,12 @@ python comparisons/scripts/train_ultralytics_external.py \
   --model yolov8s.pt \
   --api YOLO \
   --optimizer SGD \
+  --lr0 0.01 \
+  --weight-decay 0.0005 \
+  --momentum 0.937 \
   --project runs/comparisons/yolov8s
 ```
 
-The launcher runs seeds 0, 1, and 42 sequentially and records the imported package version. Replace the model identifier and optimizer only with values supported by the original experiment records.
+The launcher runs seeds 0, 1, and 42 sequentially and records the imported package version. It applies the manuscript's cosine schedule (`lrf=0.01`), three-epoch warm-up (`momentum=0.8`, `bias_lr=0.1`), AMP, 640-pixel inputs, batch size 8, 300-epoch maximum, 50-epoch patience, confidence threshold 0.25, ROI NMS IoU 0.50, and disabled online augmentation. Provide the model-specific optimizer, initial learning rate, and weight decay from Table 4. For YAML architecture definitions, also supply the official COCO checkpoint with `--weights`.
 
-Faster R-CNN, SSD-MobileNetV2, and RTMDet-tiny require their own upstream training APIs. Their exact implementation records are currently marked for author confirmation in `model_registry.yaml`; generic substitutes have deliberately not been presented as the models that generated the paper's results.
+Faster R-CNN, SSD-MobileNetV2, and RTMDet-tiny require their own upstream training APIs. Their source details are not recorded in `model_registry.yaml`; use the corresponding upstream implementation and record its revision and configuration for each run.

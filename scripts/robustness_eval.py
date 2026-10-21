@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from ultralytics import YOLO
+from evaluation.paper_validation import fixed_threshold_metrics, validate_paper
 
 CONDITIONS = ("original", "resolution_480", "resolution_320", "brightness_0.6", "brightness_1.4")
 
@@ -47,8 +48,16 @@ def main() -> None:
     test_images = Path(spec["test"])
     if not test_images.is_absolute():
         test_images = root / test_images
-    test_labels = Path(str(test_images).replace("images", "labels"))
-    image_files = [p for p in test_images.iterdir() if p.suffix.lower() in {".jpg", ".jpeg", ".png", ".bmp"}]
+    test_parts = list(test_images.parts)
+    image_dir_indices = [index for index, part in enumerate(test_parts) if part == "images"]
+    if not image_dir_indices:
+        raise ValueError("The dataset test path must include an 'images' directory component.")
+    test_parts[image_dir_indices[-1]] = "labels"
+    test_labels = Path(*test_parts)
+    image_files = sorted(p for p in test_images.iterdir()
+                         if p.suffix.lower() in {".jpg", ".jpeg", ".png", ".bmp"})
+    if not image_files:
+        raise ValueError(f"No test images found under {test_images}")
 
     model = YOLO(args.weights)
     rows = []
@@ -63,17 +72,27 @@ def main() -> None:
                 with Image.open(source) as image:
                     transform(image.convert("RGB"), condition).save(images_out / f"{source.stem}.png")
                 label = test_labels / f"{source.stem}.txt"
-                if label.exists():
-                    shutil.copy2(label, labels_out / label.name)
+                if not label.is_file():
+                    raise FileNotFoundError(f"Missing label for test image {source.name}: {label}")
+                shutil.copy2(label, labels_out / label.name)
             generated = {"path": str(temporary / condition), "train": "images/test", "val": "images/test", "test": "images/test", "names": spec["names"]}
             generated_yaml = temporary / condition / "data.yaml"
             generated_yaml.write_text(yaml.safe_dump(generated, sort_keys=False), encoding="utf-8")
-            metrics = model.val(data=str(generated_yaml), split="test", imgsz=640, batch=args.batch, device=args.device, plots=False)
+            metrics = validate_paper(
+                model, data=str(generated_yaml), split="test", imgsz=640, batch=args.batch,
+                device=args.device, conf=0.25, iou=0.50,
+            )
+            fixed = fixed_threshold_metrics(metrics)
             rows.append({
                 "condition": condition,
                 "images": len(image_files),
-                "precision": float(metrics.box.mp),
-                "recall": float(metrics.box.mr),
+                "confidence_threshold": fixed["confidence_threshold"],
+                "matching_iou_threshold": fixed["matching_iou_threshold"],
+                "tp": fixed["tp"],
+                "fp": fixed["fp"],
+                "fn": fixed["fn"],
+                "precision": fixed["precision"],
+                "recall": fixed["recall"],
                 "map50": float(metrics.box.map50),
                 "map50_95": float(metrics.box.map),
             })

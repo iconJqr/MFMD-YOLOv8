@@ -32,7 +32,8 @@ def infer(model: YOLO, image: np.ndarray, strategy: str, conf: float, device: st
         for top in starts(height, 640, 512):
             for left in starts(width, 640, 512):
                 tile = image[top:min(top + 640, height), left:min(left + 640, width)]
-                result = model.predict(tile, imgsz=640, conf=conf, device=device, verbose=False)[0]
+                result = model.predict(tile, imgsz=640, rect=False, conf=conf, iou=0.50,
+                                        device=device, verbose=False)[0]
                 if len(result.boxes):
                     xyxy = result.boxes.xyxy.cpu()
                     xyxy[:, [0, 2]] += left
@@ -41,7 +42,8 @@ def infer(model: YOLO, image: np.ndarray, strategy: str, conf: float, device: st
                     scores.append(result.boxes.conf.cpu())
                     classes.append(result.boxes.cls.cpu())
     if strategy in {"full", "combined"}:
-        result = model.predict(image, imgsz=640, conf=conf, device=device, verbose=False)[0]
+        result = model.predict(image, imgsz=640, rect=False, conf=conf, iou=0.50,
+                               device=device, verbose=False)[0]
         if len(result.boxes):
             boxes.append(result.boxes.xyxy.cpu())
             scores.append(result.boxes.conf.cpu())

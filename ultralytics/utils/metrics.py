@@ -116,6 +116,8 @@ class WIoU_Scale:
     monotonous = False
     _momentum = 1 - 0.5 ** (1 / 7000)
     _is_train = True
+    gamma = 1.9
+    delta = 3.0
 
     def __init__(self, iou):
         self.iou = iou
@@ -127,12 +129,22 @@ class WIoU_Scale:
         cls.iou_mean = float(value)
 
     @classmethod
+    def configure(cls, gamma=1.9, delta=3.0):
+        """Set the WIoU v3 focusing parameters for a single training process."""
+        if gamma <= 0 or delta <= 0:
+            raise ValueError("WIoU gamma and delta must be positive.")
+        cls.gamma = float(gamma)
+        cls.delta = float(delta)
+
+    @classmethod
     def _update(cls, self):
         if cls._is_train: cls.iou_mean = (1 - cls._momentum) * cls.iou_mean + \
                                          cls._momentum * self.iou.detach().mean().item()
 
     @classmethod
-    def _scaled_loss(cls, self, gamma=1.9, delta=3):
+    def _scaled_loss(cls, self, gamma=None, delta=None):
+        gamma = cls.gamma if gamma is None else gamma
+        delta = cls.delta if delta is None else delta
         if isinstance(self.monotonous, bool):
             if self.monotonous:
                 return (self.iou.detach() / self.iou_mean).sqrt()

@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 EXCLUDED_PARTS = {
-    ".git", "__pycache__", ".pytest_cache", ".ipynb_checkpoints",
+    ".git", ".DS_Store", "MFMD-YOLOv8", "__pycache__", ".pytest_cache", ".ipynb_checkpoints",
     "runs", "datasets", ".idea", ".vscode",
 }
 EXCLUDED_SUFFIXES = {".pt", ".onnx", ".engine", ".pyc"}

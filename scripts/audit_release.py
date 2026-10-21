@@ -7,7 +7,8 @@ import re
 from pathlib import Path
 
 
-BAD_DIRS = {"__pycache__", ".pytest_cache", ".ipynb_checkpoints", "runs", "datasets", ".idea", ".vscode"}
+BAD_DIRS = {".git", ".DS_Store", "MFMD-YOLOv8", "__pycache__", ".pytest_cache", ".ipynb_checkpoints",
+            "runs", "datasets", ".idea", ".vscode"}
 BAD_SUFFIXES = {".pt", ".pth", ".ckpt", ".onnx", ".engine", ".pyc"}
 TEXT_SUFFIXES = {".py", ".md", ".yaml", ".yml", ".txt", ".csv", ".toml", ".cfg", ".cff", ".in"}
 PRIVATE_PATTERNS = (

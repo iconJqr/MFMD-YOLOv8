@@ -1,0 +1,12 @@
+# One-factor-at-a-time runs reported in manuscript Table 9.
+# Every unspecified setting is inherited from configs/train_paper.yaml and
+# configs/models/mfmd_yolov8.yaml. The reference setting is k=4, gamma=1.9,
+# delta=3.0; each row changes exactly one value.
+reference: {bra_topk: 4, wiou_gamma: 1.9, wiou_delta: 3.0}
+runs:
+  bra_topk_2: {bra_topk: 2, wiou_gamma: 1.9, wiou_delta: 3.0}
+  bra_topk_8: {bra_topk: 8, wiou_gamma: 1.9, wiou_delta: 3.0}
+  wiou_gamma_1_5: {bra_topk: 4, wiou_gamma: 1.5, wiou_delta: 3.0}
+  wiou_gamma_2_3: {bra_topk: 4, wiou_gamma: 2.3, wiou_delta: 3.0}
+  wiou_delta_2: {bra_topk: 4, wiou_gamma: 1.9, wiou_delta: 2.0}
+  wiou_delta_4: {bra_topk: 4, wiou_gamma: 1.9, wiou_delta: 4.0}
